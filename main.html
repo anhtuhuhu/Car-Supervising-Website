@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Car Supervising Website</title>
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="left-section">
+                <div class="header">
+                    <div class="btnLogOut" id="btnLogout">
+                        <button> 
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
+                                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+                            </svg>
+                            <script>
+                                btnLogout.addEventListener("click", (e) => {
+                                    window.location.href = "login.html";
+                                });
+                            </script>
+                        </button>
+                    </div>
+                    <label style="font-size: 20px;" class="title">
+                        <b>ĐỀ TÀI: HỆ THỐNG GIÁM SÁT VÀ THU THẬP DỮ LIỆU XE Ô TÔ QUA OBD2</b>
+                    </label>
+                </div>
+                <div class="top-section">
+                    <div class="charts-container">
+                        <div class="flex-item">
+                            <div><img id="car_image" src="img/background.jpg" alt="Car Image" style="display: block;" /></div>
+                        </div>
+                        <div class="speedDisplay-chart">
+                            <canvas id="speedDisplayChart"></canvas>
+                        </div>
+                        <div class="fuel-chart">
+                            <canvas id="fuelChart" ></canvas>
+                        </div>
+                        <div class="engineLoad-chart">
+                            <canvas id="engineLoadChart" ></canvas>
+                        </div>
+                        <div class="torqueForce-chart">
+                            <canvas id="torqueForceChart" ></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="bottom-section">
+                    <div class="speed-chart">
+                        <canvas id="speedChart" width="1350" height="350"></canvas>
+                    </div>
+                    <div class="flex-item">
+                        <div class="item-header">Rotation Speed: </div>
+                        <div class="item-content"><span style="color: rgb(76, 76, 76);" id="engine_RPM"></span> <span style="color: rgb(76, 76, 76);">rpm</span></div>                    
+                    </div>
+                    <div class="flex-item">
+                        <div class="item-header">Coolant Temperature:</div>
+                        <div class="item-content"><span style="color: rgb(76, 76, 76);" id="engine_temp"></span> <span style="color: rgb(76, 76, 76);">℃</span></div>
+                    </div>
+                    <div class="flex-item">
+                        <div class="item-header">Speed:</div> 
+                        <div class="item-content"><span style="color: rgb(76, 76, 76);" id="car_spd"></span> <span style="color: rgb(76, 76, 76);">Km/h</span></div>
+                    </div>
+                    <div class="flex-item">
+                        <div class="item-header">Air Flow Rate:</div>
+                        <div class="item-content"><span style="color: rgb(76, 76, 76);" id="air_flow_rate"></span> <span style="color: rgb(76, 76, 76);">g/s</span></div>
+                    </div>
+                    <div class="flex-item">
+                        <div class="item-header">Throttle Position:</div>
+                        <div class="item-content"><span style="color: rgb(76, 76, 76);" id="throttle_pos"></span> <span style="color: rgb(76, 76, 76);">%</span></div>                     
+                    </div>
+                </div>
+            </div>
+            <div class="right-section">
+                <div>
+                    <img id="header_image" src="img/logo.png" alt="Logo Image" style="display: block;" />
+                </div>
+                <div class="labelName">
+                    <label >
+                        <b>  Sinh viên thực hiện:</b>
+                    </label>
+                    <label >
+                        <br> Nguyễn Võ Anh Tú - 20119381<br> Nguyễn Thị Hà Giang - 20119093
+                    </label>
+                </div>
+                
+                <div class="item-header">GPS Position</div>
+                <div id="map"></div>
+                <div class="data-box">
+                    <div class="item-header">Fault Codes: </div>
+                    <div id="dataBox"></div>
+                </div>
+                
+            </div>
+        </div>
+
+        <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-database.js"></script>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-doughnutlabel@1.0.3"></script>
+        <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+        <script type="text/javascript" src="https://unpkg.com/chart.js-plugin-labels-dv/dist/chartjs-plugin-labels.min.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="js/main.js"></script>
+    </body>
+</html>
